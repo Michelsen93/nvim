@@ -21,9 +21,7 @@ require("lazy").setup({
     -- Import all plugin specs from lua/plugins/
     { import = "plugins" },
   },
-  install = {
-    colorscheme = { "onedark", "habamax" },
-  },
+  install = {},
   checker = {
     enabled = false,
   },

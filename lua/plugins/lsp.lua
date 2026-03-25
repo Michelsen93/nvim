@@ -91,6 +91,7 @@ return {
         "bashls",
         "yamlls",
         "bicep",
+        "helm_ls",
       }
       require("mason-lspconfig").setup({
         ensure_installed = lsp_servers,
@@ -108,23 +109,6 @@ return {
     },
     event = { "BufReadPre", "BufNewFile" },
     config = function()
-      -- Filetype mappings
-      vim.filetype.add({
-        extension = {
-          templ = "templ",
-          tf = "terraform",
-          tfvars = "terraform",
-        }
-      })
-
-      -- Helm templates autocmd
-      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-        pattern = { "*/templates/*.yaml", "*/templates/*.tpl" },
-        callback = function()
-          vim.bo.filetype = "helm"
-        end,
-      })
-
       -- Go-specific keymap
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "go",
@@ -147,7 +131,7 @@ return {
       })
 
       vim.lsp.config('yamlls', {
-        filetypes = { "yaml", "helm" },
+        filetypes = { "yaml" },
       })
 
       vim.lsp.config('helm_ls', {
@@ -155,7 +139,10 @@ return {
         cmd = { "helm_ls", "serve" },
         settings = {
           ['helm-ls'] = {
-            yamlls = { enabled = true }
+            yamlls = {
+              enabled = true,
+              enabledForFilesGlob = "*.{yaml,yml}",
+            },
           }
         },
       })
@@ -163,11 +150,9 @@ return {
       local lsp_servers = {
         "lua_ls", "terraformls", "gopls", "jsonls", "cssls",
         "rust_analyzer", "zls", "ts_ls", "omnisharp", "templ",
-        "dockerls", "html", "htmx", "bashls", "yamlls", "bicep",
+        "dockerls", "html", "htmx", "bashls", "yamlls", "bicep", "helm_ls",
       }
-      local all_servers = vim.list_extend({}, lsp_servers)
-      table.insert(all_servers, "helm_ls")
-      vim.lsp.enable(all_servers)
+      vim.lsp.enable(lsp_servers)
 
       -- Global LSP attach
       vim.api.nvim_create_autocmd("LspAttach", {
